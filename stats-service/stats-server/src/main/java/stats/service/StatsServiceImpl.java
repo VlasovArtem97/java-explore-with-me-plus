@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import stats.model.Hit;
 import stats.repo.HitRepository;
-import stats.service.StatsService;
 import statsdto.HitDto;
 import statsdto.StatDto;
 

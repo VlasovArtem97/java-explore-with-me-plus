@@ -40,10 +40,10 @@ public class StatsController {
                                @RequestParam(defaultValue = "false") boolean unique) {
         // на случай, если клиент прислал закодированные строки
         String decStart = URLDecoder.decode(start, StandardCharsets.UTF_8);
-        String decEnd   = URLDecoder.decode(end, StandardCharsets.UTF_8);
+        String decEnd = URLDecoder.decode(end, StandardCharsets.UTF_8);
 
         LocalDateTime from = LocalDateTime.parse(decStart, FMT);
-        LocalDateTime to   = LocalDateTime.parse(decEnd, FMT);
+        LocalDateTime to = LocalDateTime.parse(decEnd, FMT);
 
         if (to.isBefore(from)) throw new BadRequestException("end must be after start");
         return service.stats(from, to, uris, unique);

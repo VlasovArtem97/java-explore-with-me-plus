@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface StatsService {
     void saveHit(HitDto dto);
+
     List<StatDto> stats(LocalDateTime start, LocalDateTime end, Collection<String> uris, boolean unique);
 }

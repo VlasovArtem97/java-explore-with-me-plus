@@ -1,7 +1,6 @@
 package ru.korshunov.statsclient;
 
 import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -9,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import statsdto.HitDto;
 import statsdto.StatDto;
 
@@ -24,9 +22,9 @@ public class StatsClientImpl implements StatsClient {
     private static final String PATH_STATS = "/stats";
 
     public StatsClientImpl(@Value("${stats-client}") String statsClientURL, RestClient.Builder restClient) {
-            this.restClient = restClient
-                    .baseUrl(statsClientURL)
-                    .build();
+        this.restClient = restClient
+                .baseUrl(statsClientURL)
+                .build();
     }
 
     @Override
@@ -68,7 +66,8 @@ public class StatsClientImpl implements StatsClient {
                 .uri(uri)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<StatDto>>() {});
+                .body(new ParameterizedTypeReference<List<StatDto>>() {
+                });
     }
 
     @Override
