@@ -68,6 +68,12 @@
             <artifactId>logbook-spring-boot-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- MapStruct, если понадобится -->
         <dependency>
             <groupId>org.mapstruct</groupId>
