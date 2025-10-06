@@ -1,24 +1,24 @@
-package user.service;
+package ru.practicum.ewm.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import error.ConflictException;
-import error.NotFoundException;
-import user.dto.NewUserRequest;
-import user.dto.UserDto;
-import user.mapper.UserMapper;
-import user.repo.UserRepository;
-import util.PageRequestUtil;
+import ru.practicum.ewm.error.ConflictException;
+import ru.practicum.ewm.error.NotFoundException;
+import ru.practicum.ewm.user.dto.NewUserRequest;
+import ru.practicum.ewm.user.dto.UserDto;
+import ru.practicum.ewm.user.mapper.UserMapper;
+import ru.practicum.ewm.user.repo.UserRepository;
+import ru.practicum.ewm.util.PageRequestUtil;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserServiceImpl implements user.service.UserService {
+public class UserServiceImpl implements UserService {
     private final UserRepository repo;
 
     @Override @Transactional

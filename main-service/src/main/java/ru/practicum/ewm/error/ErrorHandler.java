@@ -1,4 +1,4 @@
-package error;
+package ru.practicum.ewm.error;
 
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -7,13 +7,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @RestControllerAdvice
 public class ErrorHandler {
-    private error.ApiError build(HttpStatus status, String reason, String message) {
-        return error.ApiError.builder()
-                .errors(List.of())
+    private ApiError build(HttpStatus status, String reason, String message) {
+        return ApiError.builder()
+                .errors(Collections.emptyList())
                 .message(message)
                 .reason(reason)
                 .status(status.name())
@@ -23,19 +24,19 @@ public class ErrorHandler {
 
     @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public error.ApiError handle400(Exception e) {
+    public ApiError handle400(Exception e) {
         return build(HttpStatus.BAD_REQUEST, "Incorrectly made request.", e.getMessage());
     }
 
-    @ExceptionHandler(error.NotFoundException.class)
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public error.ApiError handle404(error.NotFoundException e) {
+    public ApiError handle404(NotFoundException e) {
         return build(HttpStatus.NOT_FOUND, "The required object was not found.", e.getMessage());
     }
 
-    @ExceptionHandler({error.ConflictException.class, DataIntegrityViolationException.class})
+    @ExceptionHandler({ConflictException.class, DataIntegrityViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public error.ApiError handle409(Exception e) {
+    public ApiError handle409(Exception e) {
         return build(HttpStatus.CONFLICT, "Integrity constraint has been violated.", e.getMessage());
     }
 }

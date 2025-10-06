@@ -1,9 +1,9 @@
-package user.repo;
+package ru.practicum.ewm.user.repo;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import user.model.User;
+import ru.practicum.ewm.user.model.User;
 
 import java.util.Collection;
 
