@@ -3,12 +3,14 @@ package ru.practicum.ewm.error;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.util.DateTimeUtil;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -22,10 +24,33 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class})
+//    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class})
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public ApiError handle400(Exception e) {
+//        return build(HttpStatus.BAD_REQUEST, "Incorrectly made request.", e.getMessage());
+//    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handle400(Exception e) {
-        return build(HttpStatus.BAD_REQUEST, "Incorrectly made request.", e.getMessage());
+    public ApiError handlerMethodArgumentNotValid(final MethodArgumentNotValidException e) {
+        String allError = e.getBindingResult().getFieldErrors().stream()
+                .map(error -> String.format("Field: %s. Error: %s. Value: %s",
+                        error.getField(),
+                        error.getDefaultMessage(),
+                        error.getRejectedValue()))
+                .collect(Collectors.joining("; "));
+        return build(HttpStatus.BAD_REQUEST, "Incorrectly made request", allError);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleConstraintViolation(final ConstraintViolationException e) {
+        String allError = e.getConstraintViolations().stream()
+                .map(violation -> String.format("Field: %s. Error: %s",
+                        violation.getPropertyPath().toString(),
+                        violation.getMessage()))
+                .collect(Collectors.joining("; "));
+        return build(HttpStatus.BAD_REQUEST, "Incorrectly made request", allError);
     }
 
     @ExceptionHandler(NotFoundException.class)

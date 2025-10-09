@@ -21,13 +21,14 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository repo;
+    private final CategoryMapper categoryMapper;
 
     @Override @Transactional
     public CategoryDto addCategory(NewCategoryDto dto) {
         if (repo.existsByNameIgnoreCase(dto.getName()))
             throw new ConflictException("Category name already exists: " + dto.getName());
-        Category saved = repo.save(CategoryMapper.toEntity(dto));
-        return CategoryMapper.toDto(saved);
+        Category saved = repo.save(categoryMapper.toEntity(dto));
+        return categoryMapper.toDto(saved);
     }
 
     @Override @Transactional
@@ -37,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (repo.existsByNameIgnoreCaseAndIdNot(dto.getName(), id))
             throw new ConflictException("Category name already exists: " + dto.getName());
         cat.setName(dto.getName());
-        return CategoryMapper.toDto(repo.save(cat));
+        return categoryMapper.toDto(repo.save(cat));
     }
 
     @Override @Transactional
@@ -50,12 +51,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryDto> getCategories(int from, int size) {
         var pr = PageRequestUtil.of(from, size, Sort.by("id").ascending());
-        return repo.findAll(pr).map(CategoryMapper::toDto).getContent();
+        return repo.findAll(pr).map(categoryMapper::toDto).getContent();
     }
 
+    //Поиск категории
     @Override
     public CategoryDto getCategory(long id) {
-        return repo.findById(id).map(CategoryMapper::toDto)
+        return repo.findById(id).map(categoryMapper::toDto)
                 .orElseThrow(() -> new NotFoundException("Category with id=" + id + " was not found"));
     }
 }
