@@ -16,6 +16,7 @@ import ru.practicum.ewm.event.status.StateEvent;
 import ru.practicum.ewm.util.DateTimeUtil;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPredicateExecutor<Event> {
@@ -41,6 +42,8 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
             Where e.id = :eventId
             """)
     Optional<Event> findEventById(@Param("eventId") Long eventId);
+
+    List<Event> findAllByIdIn(List<Long> eventsId);
 
 
     interface PredicatesForParamAdmin {
