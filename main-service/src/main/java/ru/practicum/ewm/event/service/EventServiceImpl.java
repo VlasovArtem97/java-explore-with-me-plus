@@ -196,9 +196,15 @@ public class EventServiceImpl implements EventService {
         return eventMapper.toEventFullDto(eventWithView.getFirst());
     }
 
-    private Event findEventWithOutDto(Long userId, Long eventId) {
+    @Override
+    public Event findEventWithOutDto(Long userId, Long eventId) {
         return eventRepository.findEventByUserIdAndEventId(eventId, userId).orElseThrow(() ->
                 new NotFoundException("Event c id - " + eventId + " не найден у пользователя с id - " + userId));
+    }
+
+    @Override
+    public void saveEventWithRequest(Event event) {
+        eventRepository.save(event);
     }
 
     //Добавил в параметры: время и уникальность. "Если проект будет расширяться"

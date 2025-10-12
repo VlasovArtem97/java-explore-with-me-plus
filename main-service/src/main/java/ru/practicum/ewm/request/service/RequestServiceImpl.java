@@ -48,7 +48,7 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("Нельзя участвовать в неопубликованном событии.");
 
         if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <=
-                requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED))
+                requestRepository.countByEventIdAndRequestStatus(eventId, RequestStatus.CONFIRMED))
             throw new ConflictException("У события достигнут лимит запросов на участие.");
 
         Request request = new Request();
@@ -87,6 +87,23 @@ public class RequestServiceImpl implements RequestService {
         Request savedRequest = requestRepository.save(requestFromDatabase);
 
         return RequestMapper.toRequestDTO(savedRequest);
+    }
+
+    @Override
+    public List<Request> findRequestsByIds(List<Long> requestIds) {
+        return requestRepository.findRequestsByIds(requestIds).orElseThrow(() ->
+                new NotFoundException("Запросы(Request) с переданными ids: " + requestIds + " не найдены:" ));
+    }
+
+    @Override
+    public void saveRequestList(List<Request> requestList) {
+        requestRepository.saveAll(requestList);
+    }
+
+    @Override
+    public List<RequestDTO> getRequestByEventId(Long eventId) {
+        List<Request> requestList = requestRepository.getRequestByEventId(eventId);
+        return requestList.stream().map(RequestMapper::toRequestDTO).toList();
     }
 
     private Request getRequestById(Long requestId) {
