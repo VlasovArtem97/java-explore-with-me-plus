@@ -220,7 +220,7 @@ public class EventServiceImpl implements EventService {
                         stat -> Long.parseLong(stat.getUri().substring(stat.getUri().lastIndexOf("/") + 1)),
                         stat -> stat
                 ));
-        for(Event event : events) {
+        for (Event event : events) {
             StatDto view = statDtoMap.get(event.getId());
             event.setViews(view != null ? view.getHits() : 0L);
         }
@@ -229,11 +229,9 @@ public class EventServiceImpl implements EventService {
 
     private void addViewEvent(HttpServletRequest httpServletRequest) {
         statsClient.addHit(HitDto.builder()
-                        .app("ewm-main-service")
-                        .uri(httpServletRequest.getRequestURI())
-                        .ip(httpServletRequest.getRemoteAddr())
+                .app("ewm-main-service")
+                .uri(httpServletRequest.getRequestURI())
+                .ip(httpServletRequest.getRemoteAddr())
                 .build());
     }
-
-
 }

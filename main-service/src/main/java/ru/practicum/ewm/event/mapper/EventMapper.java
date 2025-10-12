@@ -33,18 +33,18 @@ public interface EventMapper {
         event.views(0L);
     }
 
-//    @Mapping(source = "category", target = "category")
+    //    @Mapping(source = "category", target = "category")
 //    @Mapping(source = "initiator", target = "initiator")
 //    @Mapping(source = "location", target = "location")
     EventFullDto toEventFullDto(Event event);
 
-//    @Mapping(source = "category", target = "category")
+    //    @Mapping(source = "category", target = "category")
 //    @Mapping(source = "initiator", target = "initiator")
     EventShortDto toEventShortDto(Event event);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, qualifiedByName = "updateEvent")
     @Mapping(target = "category", ignore = true)
-    void toUpdateEvent(UpdateEventUserRequest updateEventUserRequest,@MappingTarget Event event);
+    void toUpdateEvent(UpdateEventUserRequest updateEventUserRequest, @MappingTarget Event event);
 //    {
 //        return Event.builder()
 //                .id(event.getId())

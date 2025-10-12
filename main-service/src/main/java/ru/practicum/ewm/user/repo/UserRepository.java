@@ -9,5 +9,6 @@ import java.util.Collection;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmailIgnoreCase(String email);
+
     Page<User> findAllByIdIn(Collection<Long> ids, Pageable pageable);
 }

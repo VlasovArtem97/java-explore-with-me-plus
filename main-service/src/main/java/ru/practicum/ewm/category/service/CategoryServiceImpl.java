@@ -13,7 +13,6 @@ import ru.practicum.ewm.error.ConflictException;
 import ru.practicum.ewm.error.NotFoundException;
 import ru.practicum.ewm.util.PageRequestUtil;
 
-
 import java.util.List;
 
 @Service
@@ -23,7 +22,8 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository repo;
     private final CategoryMapper categoryMapper;
 
-    @Override @Transactional
+    @Override
+    @Transactional
     public CategoryDto addCategory(NewCategoryDto dto) {
         if (repo.existsByNameIgnoreCase(dto.getName()))
             throw new ConflictException("Category name already exists: " + dto.getName());
@@ -31,7 +31,8 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toDto(saved);
     }
 
-    @Override @Transactional
+    @Override
+    @Transactional
     public CategoryDto updateCategory(long id, CategoryDto dto) {
         Category cat = repo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category with id=" + id + " was not found"));
@@ -41,7 +42,8 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toDto(repo.save(cat));
     }
 
-    @Override @Transactional
+    @Override
+    @Transactional
     public void deleteCategory(long id) {
         if (!repo.existsById(id)) throw new NotFoundException("Category with id=" + id + " was not found");
         // В будущем здесь проверим привязанные события и вернём 409
