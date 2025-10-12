@@ -75,6 +75,8 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
         static BooleanBuilder build(EventPublicParamsDto eventPublicParamsDto) {
             QEvent qEvent = QEvent.event;
             BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+            booleanBuilder.and(qEvent.state.eq(StateEvent.PUBLISHED));
             if (eventPublicParamsDto.getText() != null && !eventPublicParamsDto.getText().isBlank()) {
                 booleanBuilder.and(qEvent.annotation.containsIgnoreCase(eventPublicParamsDto.getText())
                         .or(qEvent.description.containsIgnoreCase(eventPublicParamsDto.getText()))
@@ -84,7 +86,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
                 booleanBuilder.and(qEvent.category.id.in(eventPublicParamsDto.getCategories()));
             }
             if (eventPublicParamsDto.getPaid() != null) {
-                booleanBuilder.and(qEvent.paid.in(eventPublicParamsDto.getPaid()));
+                booleanBuilder.and(qEvent.paid.eq(eventPublicParamsDto.getPaid()));
             }
             if (eventPublicParamsDto.getRangeStart() != null && eventPublicParamsDto.getRangeEnd() != null) {
                 if (DateTimeUtil.isValidStartAndEnd(eventPublicParamsDto.getRangeStart(), eventPublicParamsDto.getRangeEnd())) {
@@ -97,7 +99,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
             if (eventPublicParamsDto.getOnlyAvailable()) {
                 booleanBuilder.and(qEvent.participantLimit.gt(qEvent.confirmedRequests));
             } else {
-                booleanBuilder.and(qEvent.confirmedRequests.goe(qEvent.participantLimit));
+                booleanBuilder.and(qEvent.participantLimit.goe(qEvent.confirmedRequests));
             }
             return booleanBuilder;
         }

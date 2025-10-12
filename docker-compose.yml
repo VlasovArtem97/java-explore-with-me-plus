@@ -27,6 +27,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stat-server
       - SPRING_DATASOURCE_USERNAME=stat
       - SPRING_DATASOURCE_PASSWORD=stat
+      - STATS_CLIENT_URL=http://stats:9090/stats
 
   ewm-db:
     image: postgres:16.1

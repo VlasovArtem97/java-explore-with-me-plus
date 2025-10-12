@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,14 @@ public class PublicEventController {
                                                        @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                        @RequestParam(required = false) String sort,
                                                        @RequestParam(defaultValue = "0") int from,
-                                                       @RequestParam(defaultValue = "10") int size) {
+                                                       @RequestParam(defaultValue = "10") int size,
+                                                       HttpServletRequest request) {
 
+        System.out.println();
+        System.out.println();
+        System.out.println(text);
+        System.out.println();
+        System.out.println();
         SortForParamPublicEvent sortParam = SortForParamPublicEvent.from(sort).orElse(null);
         return eventService.findEventByParamsPublic(EventPublicParamsDto.builder()
                 .text(text)
@@ -45,11 +52,12 @@ public class PublicEventController {
                 .sort(sortParam)
                 .from(from)
                 .size(size)
-                .build());
+                .build(), request);
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto findPublicEventById(@PathVariable @Positive @NotNull Long eventId) {
-        return eventService.findPublicEventById(eventId);
+    public EventFullDto findPublicEventById(@PathVariable @Positive @NotNull Long eventId,
+                                            HttpServletRequest request) {
+        return eventService.findPublicEventById(eventId, request);
     }
 }

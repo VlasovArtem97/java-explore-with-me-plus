@@ -12,6 +12,7 @@ import statsdto.HitDto;
 import statsdto.StatDto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -20,6 +21,8 @@ public class StatsClientImpl implements StatsClient {
     private final RestClient restClient;
     private static final String PATH_HIT = "/hit";
     private static final String PATH_STATS = "/stats";
+    //добавил
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public StatsClientImpl(@Value("${stats-client}") String statsClientURL, RestClient.Builder restClient) {
         this.restClient = restClient
@@ -102,8 +105,8 @@ public class StatsClientImpl implements StatsClient {
     public List<StatDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         String uri = UriComponentsBuilder
                 .fromPath(PATH_STATS)
-                .queryParam("start", start)
-                .queryParam("end", end)
+                .queryParam("start", start.format(FORMATTER))
+                .queryParam("end", end.format(FORMATTER))
                 .queryParam("uris", uris)
                 .queryParam("unique", unique)
                 .build()
