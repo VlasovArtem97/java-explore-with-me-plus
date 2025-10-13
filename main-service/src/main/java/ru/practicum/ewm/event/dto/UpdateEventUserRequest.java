@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.dto;
 
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -27,6 +28,7 @@ public class UpdateEventUserRequest {
     @Size(min = 20, max = 7000)
     private String description;
 
+    @Future
     private LocalDateTime eventDate;
 
     private LocationDto location;

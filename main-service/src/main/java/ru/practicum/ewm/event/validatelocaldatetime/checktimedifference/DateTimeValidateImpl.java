@@ -1,8 +1,9 @@
-package ru.practicum.ewm.event.validatelocaldatetime;
+package ru.practicum.ewm.event.validatelocaldatetime.checktimedifference;
 
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import ru.practicum.ewm.event.validatelocaldatetime.DateTimeValidate;
 
 import java.time.LocalDateTime;
 

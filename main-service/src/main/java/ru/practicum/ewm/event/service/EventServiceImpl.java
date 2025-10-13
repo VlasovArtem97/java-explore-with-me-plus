@@ -73,7 +73,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto findEventByIdAndEventId(Long userId, Long eventId) {
         userService.findUserById(userId);
         Event event = findEventWithOutDto(userId, eventId);
-        List<Event> eventsWithView = getStats(List.of(event), null, null, false);
+        List<Event> eventsWithView = getStats(List.of(event), null, null, true);
         return eventMapper.toEventFullDto(eventsWithView.getFirst());
     }
 
@@ -101,7 +101,7 @@ public class EventServiceImpl implements EventService {
         }
         //проверка категории и локации
         Event updateEventWithCategoryAndLocation = updateCategoryAndLocation(updateEventUserRequest, event);
-        List<Event> eventWithView = getStats(List.of(updateEventWithCategoryAndLocation), null, null, false);
+        List<Event> eventWithView = getStats(List.of(updateEventWithCategoryAndLocation), null, null, true);
         eventMapper.toUpdateEvent(updateEventUserRequest, eventWithView.getFirst());
         return eventMapper.toEventFullDto(eventRepository.save(eventWithView.getFirst()));
     }
@@ -116,24 +116,27 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto updateEventAdmin(Long eventId, UpdateEventAdminRequestDto updateEventAdminRequestDto) {
         Event event = findEventById(eventId);
-        if (!event.getEventDate().isAfter(LocalDateTime.now().plusHours(1))) {
-            throw new ConflictException("Дата начала изменяемого события должна быть " +
-                    "не ранее чем за час от текущего времени. Текущая дата события: " + event.getEventDate());
+        if (updateEventAdminRequestDto.getEventDate() != null) {
+            if (!event.getEventDate().isAfter(LocalDateTime.now().plusHours(1))) {
+                throw new ConflictException("Дата начала изменяемого события должна быть " +
+                        "не ранее чем за час от текущего времени. Текущая дата события: " + event.getEventDate());
+            }
         }
         if (!event.getState().equals(StateEvent.PENDING)) {
-            throw new ConflictException("Статус у события, которое планируется опубликовать, " +
+            throw new ConflictException("Статус у события, которое планируется опубликовать/отклонить, " +
                     "должен быть PENDING. Текущий статус: " + event.getState());
         }
-        if (updateEventAdminRequestDto.getStateAction().equals(StateForUpdateEvent.PUBLISH_EVENT)) {
-            event.setState(StateEvent.PUBLISHED);
-            event.setPublishedOn(LocalDateTime.now());
-        }
-        if (updateEventAdminRequestDto.getStateAction().equals(StateForUpdateEvent.REJECT_EVENT)) {
-            event.setState(StateEvent.CANCELED);
+        if (updateEventAdminRequestDto.getStateAction() != null) {
+            if (updateEventAdminRequestDto.getStateAction().equals(StateForUpdateEvent.PUBLISH_EVENT)) {
+                event.setState(StateEvent.PUBLISHED);
+                event.setPublishedOn(LocalDateTime.now());
+            }
+            if (updateEventAdminRequestDto.getStateAction().equals(StateForUpdateEvent.REJECT_EVENT)) {
+                event.setState(StateEvent.CANCELED);
+            }
         }
         Event updateEventWithCategoryAndLocation = updateCategoryAndLocation(updateEventAdminRequestDto, event);
-
-        List<Event> eventWithView = getStats(List.of(updateEventWithCategoryAndLocation), null, null, false);
+        List<Event> eventWithView = getStats(List.of(updateEventWithCategoryAndLocation), null, null, true);
         eventMapper.toUpdateEvent(updateEventAdminRequestDto, eventWithView.getFirst());
         return eventMapper.toEventFullDto(eventRepository.save(eventWithView.getFirst()));
     }
@@ -146,12 +149,18 @@ public class EventServiceImpl implements EventService {
                 eventParamDto.getSize(), Sort.by("id").ascending());
 
         List<Event> event = eventRepository.findAll(booleanBuilder, pageable).getContent();
-        List<Event> eventWithView = getStats(event, null, null, false);
+        List<Event> eventWithView = getStats(event, null, null, true);
         return eventWithView.stream().map(eventMapper::toEventFullDto).toList();
     }
 
     @Override
     public List<EventShortDto> findEventByParamsPublic(EventPublicParamsDto eventPublicParamsDto, HttpServletRequest request) {
+        if (eventPublicParamsDto.getRangeEnd() != null && eventPublicParamsDto.getRangeStart() != null) {
+            if (eventPublicParamsDto.getRangeEnd().isBefore(eventPublicParamsDto.getRangeStart())) {
+                throw new IllegalStateException("Дата RangeEnd не должна быть раньше даты RangeStart. RangeStart:" +
+                        eventPublicParamsDto.getRangeStart() + ". RangeEnd:" + eventPublicParamsDto.getRangeEnd());
+            }
+        }
         BooleanBuilder booleanBuilder = EventRepository.PredicatesForParamPublic.build(eventPublicParamsDto);
 
         String sort = (eventPublicParamsDto.getSort() != null &&
@@ -166,7 +175,7 @@ public class EventServiceImpl implements EventService {
                 eventPublicParamsDto.getSize(), Sort.by(sort).descending());
 
         List<Event> event = eventRepository.findAll(booleanBuilder, pageable).getContent();
-        List<Event> eventWithView = getStats(event, null, null, false);
+        List<Event> eventWithView = getStats(event, null, null, true);
         addViewEvent(request);
         return eventWithView.stream().map(eventMapper::toEventShortDto).toList();
     }
@@ -191,7 +200,7 @@ public class EventServiceImpl implements EventService {
         if (!event.getState().equals(StateEvent.PUBLISHED)) {
             throw new NotFoundException("Событие не доступно. Статус события: " + event.getState());
         }
-        List<Event> eventWithView = getStats(List.of(event), null, null, false);
+        List<Event> eventWithView = getStats(List.of(event), null, null, true);
         addViewEvent(request);
         return eventMapper.toEventFullDto(eventWithView.getFirst());
     }
@@ -221,7 +230,10 @@ public class EventServiceImpl implements EventService {
         Boolean uni = Objects.requireNonNullElseGet(unique, () -> false);
 
         List<StatDto> statDtos = statsClient.getStats(rangeStart, rangeEnd, eventsUri.values().stream().toList(), uni);
+
         Map<Long, StatDto> statDtoMap = statDtos.stream()
+                .filter(stat -> stat.getUri().
+                        substring(stat.getUri().lastIndexOf("/") + 1).matches("\\d+"))
                 .collect(Collectors.toMap(
                         stat -> Long.parseLong(stat.getUri().substring(stat.getUri().lastIndexOf("/") + 1)),
                         stat -> stat

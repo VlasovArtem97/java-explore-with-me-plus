@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewm.request.dto.RequestDTO;
-import ru.practicum.ewm.request.model.Request;
 
 import java.util.List;
 

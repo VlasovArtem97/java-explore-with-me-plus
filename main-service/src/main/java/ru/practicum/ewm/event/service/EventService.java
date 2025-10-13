@@ -1,12 +1,8 @@
 package ru.practicum.ewm.event.service;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.request.dto.RequestDTO;
 
 import java.util.List;
 

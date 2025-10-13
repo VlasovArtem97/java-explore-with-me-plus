@@ -82,7 +82,8 @@ public class RequestServiceImpl implements RequestService {
         getRequestById(requestId);
 
         Request requestFromDatabase = requestRepository.findByIdAndRequesterId(requestId, userId);
-        requestFromDatabase.setRequestStatus(RequestStatus.CANCELED);
+        requestFromDatabase.setRequestStatus(RequestStatus.REJECTED);
+//        requestFromDatabase.setRequestStatus(RequestStatus.CANCELED);
 
         Request savedRequest = requestRepository.save(requestFromDatabase);
 
@@ -92,7 +93,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<Request> findRequestsByIds(List<Long> requestIds) {
         return requestRepository.findRequestsByIds(requestIds).orElseThrow(() ->
-                new NotFoundException("Запросы(Request) с переданными ids: " + requestIds + " не найдены:" ));
+                new NotFoundException("Запросы(Request) с переданными ids: " + requestIds + " не найдены:"));
     }
 
     @Override

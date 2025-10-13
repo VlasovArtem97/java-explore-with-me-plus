@@ -1,6 +1,5 @@
 package ru.practicum.ewm.error;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,6 +13,5 @@ public class ApiError {
     private final String message;
     private final String reason;
     private final String status;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime timestamp;
 }

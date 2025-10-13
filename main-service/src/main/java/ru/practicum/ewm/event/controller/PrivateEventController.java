@@ -58,7 +58,7 @@ public class PrivateEventController {
         return eventWithRequest.updateRequestUser(userId, eventId, request);
     }
 
-    @GetMapping("/requests")
+    @GetMapping("/{eventId}/requests")
     public List<RequestDTO> getEventRequest(@PathVariable @Positive @NotNull Long userId,
                                             @PathVariable @Positive @NotNull Long eventId) {
         return eventWithRequest.getEventRequest(userId, eventId);

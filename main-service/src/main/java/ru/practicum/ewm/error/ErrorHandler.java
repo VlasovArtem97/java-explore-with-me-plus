@@ -24,12 +24,6 @@ public class ErrorHandler {
                 .build();
     }
 
-//    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class})
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ApiError handle400(Exception e) {
-//        return build(HttpStatus.BAD_REQUEST, "Incorrectly made request.", e.getMessage());
-//    }
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handlerMethodArgumentNotValid(final MethodArgumentNotValidException e) {
@@ -50,7 +44,14 @@ public class ErrorHandler {
                         violation.getPropertyPath().toString(),
                         violation.getMessage()))
                 .collect(Collectors.joining("; "));
-        return build(HttpStatus.BAD_REQUEST, "Incorrectly made request", allError);
+        return build(HttpStatus.CONFLICT, "Incorrectly made request", allError);
+    }
+
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleIllegalState(final IllegalStateException e) {
+        return build(HttpStatus.BAD_REQUEST, "Incorrectly made request", e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)

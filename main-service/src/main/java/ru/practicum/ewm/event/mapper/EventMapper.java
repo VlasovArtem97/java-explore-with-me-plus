@@ -33,42 +33,11 @@ public interface EventMapper {
         event.views(0L);
     }
 
-    //    @Mapping(source = "category", target = "category")
-//    @Mapping(source = "initiator", target = "initiator")
-//    @Mapping(source = "location", target = "location")
     EventFullDto toEventFullDto(Event event);
 
-    //    @Mapping(source = "category", target = "category")
-//    @Mapping(source = "initiator", target = "initiator")
     EventShortDto toEventShortDto(Event event);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, qualifiedByName = "updateEvent")
     @Mapping(target = "category", ignore = true)
     void toUpdateEvent(UpdateEventUserRequest updateEventUserRequest, @MappingTarget Event event);
-//    {
-//        return Event.builder()
-//                .id(event.getId())
-//                .annotation(updateEventUserRequest.getAnnotation() != null ? updateEventUserRequest.getAnnotation() :
-//                        event.getAnnotation())
-//                .category(event.getCategory())
-//                .description(updateEventUserRequest.getDescription() != null ? updateEventUserRequest.getDescription() :
-//                        event.getDescription())
-//                .eventDate(event.getEventDate())
-//                .paid((updateEventUserRequest.getPaid() != null ? updateEventUserRequest.getPaid() :
-//                        event.getPaid()))
-//                .participantLimit((updateEventUserRequest.getParticipantLimit() != null ?
-//                        updateEventUserRequest.getParticipantLimit() : event.getParticipantLimit()))
-//                .title(updateEventUserRequest.getTitle() != null ? updateEventUserRequest.getTitle() : event.getTitle())
-//                .state(event.getState())
-//                .createdOn(event.getCreatedOn())
-//                .requestModeration(updateEventUserRequest.getRequestModeration() != null ?
-//                        updateEventUserRequest.getRequestModeration() : event.getRequestModeration())
-//                .initiator(event.getInitiator())
-//                .confirmedRequests(event.getConfirmedRequests())
-//                .publishedOn(event.getPublishedOn() != null ? event.getPublishedOn() : null)
-//                .title(updateEventUserRequest.getTitle() != null ? updateEventUserRequest.getTitle() :
-//                        event.getTitle())
-//                .location(event.getLocation())
-//                .build();
-//    }
 }

@@ -5,7 +5,7 @@ import ru.practicum.ewm.request.model.Request;
 
 public class RequestMapper {
 
-    private RequestMapper () {
+    private RequestMapper() {
 
     }
 

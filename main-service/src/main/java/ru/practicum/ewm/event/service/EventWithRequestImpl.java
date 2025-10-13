@@ -7,7 +7,6 @@ import ru.practicum.ewm.error.ConflictException;
 import ru.practicum.ewm.event.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.event.dto.EventRequestStatusUpdateResult;
 import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.event.status.StatusRequest;
 import ru.practicum.ewm.request.dto.RequestDTO;
 import ru.practicum.ewm.request.mapper.RequestMapper;
 import ru.practicum.ewm.request.model.Request;
@@ -38,37 +37,43 @@ public class EventWithRequestImpl implements EventWithRequest {
         List<Request> confirmedRequests = new ArrayList<>();
         List<Request> rejectedRequests = new ArrayList<>();
 
+        if (Objects.equals(event.getConfirmedRequests(), event.getParticipantLimit()) &&
+                request.getStatus().equals(RequestStatus.CONFIRMED)) {
+            throw new ConflictException("У события достигнут лимит запросов на участие.");
+        }
+
         for (Request req : requestList) {
-            if (req.getRequestStatus().equals(RequestStatus.CANCELED)) {
+            if (req.getRequestStatus().equals(RequestStatus.REJECTED) || req.getRequestStatus().equals(RequestStatus.CONFIRMED)) {
                 throw new ConflictException("Заявку c Id: " + req.getId() +
                         " можно одобрить, если у нее статус: " + RequestStatus.PENDING);
             }
         }
 
-        if (request.getStatus().equals(StatusRequest.REJECTED)) {
-            for (Request req : requestList) {
-                req.setRequestStatus(RequestStatus.CANCELED);
-                rejectedRequests.add(req);
-            }
-        }
-
-        if (Objects.equals(event.getConfirmedRequests(), event.getParticipantLimit())) {
-            throw new ConflictException("У события достигнут лимит запросов на участие.");
-        } else if (!event.getRequestModeration() || event.getParticipantLimit().equals(0L)) {
+        if ((!event.getRequestModeration() || event.getParticipantLimit().equals(0L)) && request.getStatus().equals(RequestStatus.CONFIRMED)) {
             for (Request req : requestList) {
                 req.setRequestStatus(RequestStatus.CONFIRMED);
                 event.setConfirmedRequests(event.getConfirmedRequests() + 1);
                 confirmedRequests.add(req);
             }
+        } else if ((!event.getRequestModeration() || event.getParticipantLimit().equals(0L)) && request.getStatus().equals(RequestStatus.REJECTED)) {
+            for (Request req : requestList) {
+                req.setRequestStatus(RequestStatus.REJECTED);
+                rejectedRequests.add(req);
+            }
+        } else if (request.getStatus().equals(RequestStatus.REJECTED)) {
+            for (Request req : requestList) {
+                req.setRequestStatus(RequestStatus.REJECTED);
+                rejectedRequests.add(req);
+            }
         } else {
             for (Request req : requestList) {
-                if (event.getConfirmedRequests().equals(event.getParticipantLimit())) {
-                    req.setRequestStatus(RequestStatus.CANCELED);
+                if (Objects.equals(event.getConfirmedRequests(), event.getParticipantLimit())) {
+                    req.setRequestStatus(RequestStatus.REJECTED);
                     rejectedRequests.add(req);
                 } else {
                     req.setRequestStatus(RequestStatus.CONFIRMED);
                     event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-                    rejectedRequests.add(req);
+                    confirmedRequests.add(req);
                 }
             }
         }
@@ -76,8 +81,8 @@ public class EventWithRequestImpl implements EventWithRequest {
         List<Request> allRequest = new ArrayList<>();
         allRequest.addAll(confirmedRequests);
         allRequest.addAll(rejectedRequests);
-        requestService.saveRequestList(allRequest);
 
+        requestService.saveRequestList(allRequest);
         eventService.saveEventWithRequest(event);
 
         return EventRequestStatusUpdateResult.builder()

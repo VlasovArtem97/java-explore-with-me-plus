@@ -29,6 +29,7 @@ public class NewEventDto {
     private String description;
 
     @DateTimeValidate
+    @Future
     private LocalDateTime eventDate;
 
     @NotNull

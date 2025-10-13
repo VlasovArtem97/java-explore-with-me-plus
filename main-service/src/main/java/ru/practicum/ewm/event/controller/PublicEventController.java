@@ -35,12 +35,6 @@ public class PublicEventController {
                                                        @RequestParam(defaultValue = "0") int from,
                                                        @RequestParam(defaultValue = "10") int size,
                                                        HttpServletRequest request) {
-
-        System.out.println();
-        System.out.println();
-        System.out.println(text);
-        System.out.println();
-        System.out.println();
         SortForParamPublicEvent sortParam = SortForParamPublicEvent.from(sort).orElse(null);
         return eventService.findEventByParamsPublic(EventPublicParamsDto.builder()
                 .text(text)

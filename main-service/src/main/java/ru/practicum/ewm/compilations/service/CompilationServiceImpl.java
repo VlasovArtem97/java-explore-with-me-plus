@@ -56,8 +56,8 @@ public class CompilationServiceImpl implements CompilationService {
 
         if (eventsId != null) {
             List<Event> events = updateCompilationDTO.getEventsId().stream().map(id -> Event.builder()
-                    .id(id)
-                    .build())
+                            .id(id)
+                            .build())
                     .collect(Collectors.toList());
 
             foundCompilation.setEvents(events);
