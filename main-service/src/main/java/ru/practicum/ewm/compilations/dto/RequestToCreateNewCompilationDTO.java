@@ -18,8 +18,7 @@ public class RequestToCreateNewCompilationDTO {
 
     private List<Long> eventsId;
 
-    @NotNull
-    private Boolean pinned;
+    private boolean pinned;
 
     @NotBlank(message = "Подборка событий должна иметь название")
     @Size(min = 3)

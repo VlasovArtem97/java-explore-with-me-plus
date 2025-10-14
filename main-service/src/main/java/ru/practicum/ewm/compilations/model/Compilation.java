@@ -22,10 +22,9 @@ public class Compilation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Event> events = new ArrayList<>();
 
-    @Column(nullable = false)
     private Boolean pinned;
 
     @Column(nullable = false)

@@ -33,5 +33,6 @@ public class Request {
     private User requester;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private RequestStatus requestStatus;
 }
