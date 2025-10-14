@@ -34,6 +34,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDTO addCompilation(RequestToCreateNewCompilationDTO newCompilationDTO) {
+
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDTO);
 
         List<Long> eventsId = newCompilationDTO.getEventsId();

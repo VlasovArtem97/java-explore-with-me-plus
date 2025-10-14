@@ -1,5 +1,6 @@
 package ru.practicum.ewm.compilations.mapper;
 
+import lombok.experimental.UtilityClass;
 import ru.practicum.ewm.compilations.dto.CompilationDTO;
 import ru.practicum.ewm.compilations.dto.RequestToCreateNewCompilationDTO;
 import ru.practicum.ewm.compilations.model.Compilation;
@@ -7,11 +8,8 @@ import ru.practicum.ewm.event.mapper.EventMapper;
 
 import java.util.stream.Collectors;
 
+@UtilityClass
 public class CompilationMapper {
-
-    private CompilationMapper() {
-
-    }
 
     public static Compilation toCompilation(RequestToCreateNewCompilationDTO newCompilationDTO) {
         return Compilation.builder()

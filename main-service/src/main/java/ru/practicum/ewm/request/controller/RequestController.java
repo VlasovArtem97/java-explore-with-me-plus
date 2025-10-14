@@ -1,5 +1,6 @@
 package ru.practicum.ewm.request.controller;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,8 @@ public class RequestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RequestDTO addRequestCurrentUser(@Positive @PathVariable Long userId, @Positive Long eventId) {
+    public RequestDTO addRequestCurrentUser(@Positive @PathVariable Long userId,
+                                            @RequestParam @NotNull @Positive Long eventId) {
         return requestService.addRequestCurrentUser(userId, eventId);
     }
 

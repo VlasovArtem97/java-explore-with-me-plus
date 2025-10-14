@@ -43,7 +43,7 @@ public class EventWithRequestImpl implements EventWithRequest {
         }
 
         for (Request req : requestList) {
-            if (req.getRequestStatus().equals(RequestStatus.REJECTED) || req.getRequestStatus().equals(RequestStatus.CONFIRMED)) {
+            if (!req.getRequestStatus().equals(RequestStatus.PENDING)) {
                 throw new ConflictException("Заявку c Id: " + req.getId() +
                         " можно одобрить, если у нее статус: " + RequestStatus.PENDING);
             }

@@ -47,24 +47,27 @@ public class RequestServiceImpl implements RequestService {
         if (!event.getState().equals(StateEvent.PUBLISHED))
             throw new ConflictException("Нельзя участвовать в неопубликованном событии.");
 
-        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <=
-                requestRepository.countByEventIdAndRequestStatus(eventId, RequestStatus.CONFIRMED))
+        if(event.getParticipantLimit() != 0 && event.getParticipantLimit().equals(event.getConfirmedRequests())) {
             throw new ConflictException("У события достигнут лимит запросов на участие.");
+        }
 
         Request request = new Request();
         request.setCreated(LocalDateTime.now());
         request.setRequester(user);
         request.setEvent(event);
 
-        if (event.getRequestModeration()) {
-            request.setRequestStatus(RequestStatus.PENDING);
-        } else {
+        if(!event.getRequestModeration()) {
             request.setRequestStatus(RequestStatus.CONFIRMED);
+            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+        } else {
+            if(event.getParticipantLimit() == 0) {
+                request.setRequestStatus(RequestStatus.CONFIRMED);
+                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+            } else {
+                request.setRequestStatus(RequestStatus.PENDING);
+            }
         }
-
-        Request savedRequest = requestRepository.save(request);
-
-        return RequestMapper.toRequestDTO(savedRequest);
+        return RequestMapper.toRequestDTO(requestRepository.save(request));
     }
 
     @Override
@@ -82,8 +85,7 @@ public class RequestServiceImpl implements RequestService {
         getRequestById(requestId);
 
         Request requestFromDatabase = requestRepository.findByIdAndRequesterId(requestId, userId);
-        requestFromDatabase.setRequestStatus(RequestStatus.REJECTED);
-//        requestFromDatabase.setRequestStatus(RequestStatus.CANCELED);
+        requestFromDatabase.setRequestStatus(RequestStatus.CANCELED);
 
         Request savedRequest = requestRepository.save(requestFromDatabase);
 
