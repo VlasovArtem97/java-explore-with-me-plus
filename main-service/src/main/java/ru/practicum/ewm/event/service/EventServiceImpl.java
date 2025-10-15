@@ -242,8 +242,8 @@ public class EventServiceImpl implements EventService {
         List<StatDto> statDtos = statsClient.getStats(rangeStart, rangeEnd, eventsUri.values().stream().toList(), uni);
 
         Map<Long, StatDto> statDtoMap = statDtos.stream()
-                .filter(stat -> stat.getUri().
-                        substring(stat.getUri().lastIndexOf("/") + 1).matches("\\d+"))
+                .filter(stat -> stat.getUri()
+                        .substring(stat.getUri().lastIndexOf("/") + 1).matches("\\d+"))
                 .collect(Collectors.toMap(
                         stat -> Long.parseLong(stat.getUri().substring(stat.getUri().lastIndexOf("/") + 1)),
                         stat -> stat
