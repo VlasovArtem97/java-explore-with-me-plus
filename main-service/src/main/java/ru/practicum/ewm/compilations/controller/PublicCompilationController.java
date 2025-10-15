@@ -1,5 +1,6 @@
 package ru.practicum.ewm.compilations.controller;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,15 +26,15 @@ public class PublicCompilationController {
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
     public List<CompilationDTO> getCompilationsList(
-            Boolean pinned,
-            @Positive @RequestParam(defaultValue = "0") Integer from,
-            @Positive @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam(defaultValue = "false") Boolean pinned,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size) {
         return compilationService.getCompilationsList(pinned, from, size);
     }
 
     @GetMapping("/{compId}")
     @ResponseStatus(value = HttpStatus.OK)
-    public CompilationDTO getCompilationById(@Positive Long compId) {
+    public CompilationDTO getCompilationById(@PathVariable @NotNull @Positive Long compId) {
         return compilationService.getCompilationById(compId);
     }
 }

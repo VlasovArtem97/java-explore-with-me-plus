@@ -11,6 +11,8 @@ import ru.practicum.ewm.compilations.dto.RequestToCreateNewCompilationDTO;
 import ru.practicum.ewm.compilations.dto.UpdateCompilationDTO;
 import ru.practicum.ewm.compilations.service.CompilationService;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/admin/compilations")
 @Validated
@@ -33,8 +35,9 @@ public class AdminCompilationController {
     @ResponseStatus(value = HttpStatus.OK)
     public CompilationDTO updateCompilation(
             @Positive @PathVariable Long compId,
-            @Valid @RequestBody UpdateCompilationDTO updateCompilationDTO) {
-        return compilationService.updateCompilation(compId, updateCompilationDTO);
+            @Valid @RequestBody(required = false) UpdateCompilationDTO updateCompilationDTO) {
+        return compilationService.updateCompilation(compId,
+                Objects.requireNonNullElseGet(updateCompilationDTO, UpdateCompilationDTO::new));
     }
 
     @DeleteMapping("/{compId}")

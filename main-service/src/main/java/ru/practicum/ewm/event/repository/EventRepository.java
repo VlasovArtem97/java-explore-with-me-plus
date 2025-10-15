@@ -43,7 +43,12 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
             """)
     Optional<Event> findEventById(@Param("eventId") Long eventId);
 
-    List<Event> findAllByIdIn(List<Long> eventsId);
+    @EntityGraph(attributePaths = {"category", "initiator", "location"})
+    @Query("""
+            Select e From Event e
+            Where e.id in(:eventsId)
+            """)
+    List<Event> findEventsByIds(@Param("eventsId") List<Long> eventsId);
 
 
     interface PredicatesForParamAdmin {

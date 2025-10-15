@@ -1,31 +1,22 @@
 package ru.practicum.ewm.compilations.mapper;
 
-import lombok.experimental.UtilityClass;
+import org.mapstruct.*;
 import ru.practicum.ewm.compilations.dto.CompilationDTO;
 import ru.practicum.ewm.compilations.dto.RequestToCreateNewCompilationDTO;
+import ru.practicum.ewm.compilations.dto.UpdateCompilationDTO;
 import ru.practicum.ewm.compilations.model.Compilation;
-import ru.practicum.ewm.event.mapper.EventMapper;
 
-import java.util.stream.Collectors;
+@Mapper(componentModel = "spring")
+public interface CompilationMapper {
 
-@UtilityClass
-public class CompilationMapper {
+    @Mapping(target = "events", ignore = true)
+    Compilation toCompilation(RequestToCreateNewCompilationDTO newCompilationDTO);
 
-    public static Compilation toCompilation(RequestToCreateNewCompilationDTO newCompilationDTO) {
-        return Compilation.builder()
-                .pinned(newCompilationDTO.getPinned())
-                .title(newCompilationDTO.getTitle())
-                .build();
-    }
+    CompilationDTO toCompilationDto(Compilation compilation);
 
-    public static CompilationDTO toCompilationDTO(Compilation compilation, EventMapper eventMapper) {
-        return CompilationDTO.builder()
-                .id(compilation.getId())
-                .events(compilation.getEvents().stream()
-                        .map(eventMapper::toEventShortDto)
-                        .collect(Collectors.toList()))
-                .pinned(compilation.getPinned())
-                .title(compilation.getTitle())
-                .build();
-    }
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "events", ignore = true)
+    void updateCompilation(UpdateCompilationDTO updateCompilationDTO, @MappingTarget Compilation compilation);
+
+
 }

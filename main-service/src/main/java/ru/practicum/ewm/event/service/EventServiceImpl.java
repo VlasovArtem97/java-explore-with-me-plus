@@ -212,6 +212,16 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public List<Event> findEventsByids(List<Long> eventsIds) {
+        List<Event> events = eventRepository.findEventsByIds(eventsIds);
+        if (events.isEmpty()) {
+            throw new NotFoundException("Events c ids - " + eventsIds + " не найдены");
+        } else {
+            return getStats(events, null, null, true);
+        }
+    }
+
+    @Override
     public void saveEventWithRequest(Event event) {
         eventRepository.save(event);
     }

@@ -13,18 +13,4 @@ public interface CategoryMapper {
     CategoryDto toDto(Category e);
 
     Category toCategory(CategoryDto categoryDto);
-//    public static Category toEntity(NewCategoryDto dto) {
-//        return Category.builder().name(dto.getName()).build();
-//    }
-//
-//    public static CategoryDto toDto(Category e) {
-//        return CategoryDto.builder().id(e.getId()).name(e.getName()).build();
-//    }
-//
-//    public static Category toCategory(CategoryDto categoryDto) {
-//        return Category.builder()
-//                .id(categoryDto.getId())
-//                .name(categoryDto.getName())
-//                .build();
-//    }
 }

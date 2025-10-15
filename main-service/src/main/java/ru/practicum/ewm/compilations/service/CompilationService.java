@@ -17,4 +17,5 @@ public interface CompilationService {
     CompilationDTO getCompilationById(Long compId);
 
     void removeCompilation(Long compId);
+
 }

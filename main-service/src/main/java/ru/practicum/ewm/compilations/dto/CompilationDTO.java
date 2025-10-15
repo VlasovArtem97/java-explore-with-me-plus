@@ -1,7 +1,6 @@
 package ru.practicum.ewm.compilations.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,10 +20,9 @@ public class CompilationDTO {
 
     private List<EventShortDto> events;
 
-    @NotNull
     private Boolean pinned;
 
     @NotBlank(message = "Подборка событий должна иметь название")
-    @Size(min = 3)
+    @Size(min = 3, max = 50)
     private String title;
 }

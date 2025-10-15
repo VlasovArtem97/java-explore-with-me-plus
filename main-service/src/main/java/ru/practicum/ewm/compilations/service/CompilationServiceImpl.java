@@ -1,9 +1,10 @@
 package ru.practicum.ewm.compilations.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.compilations.dto.CompilationDTO;
 import ru.practicum.ewm.compilations.dto.RequestToCreateNewCompilationDTO;
 import ru.practicum.ewm.compilations.dto.UpdateCompilationDTO;
@@ -13,63 +14,53 @@ import ru.practicum.ewm.compilations.repository.CompilationRepository;
 import ru.practicum.ewm.error.NotFoundException;
 import ru.practicum.ewm.event.mapper.EventMapper;
 import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.event.repository.EventRepository;
+import ru.practicum.ewm.event.service.EventService;
+import ru.practicum.ewm.util.PageRequestUtil;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @Service
 public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;
-    private final EventRepository eventRepository;
+    private final EventService eventService;
     private final EventMapper eventMapper;
+    private final CompilationMapper compilationMapper;
 
     @Autowired
-    public CompilationServiceImpl(CompilationRepository compilationRepository, EventRepository eventRepository, EventMapper eventMapper) {
+    public CompilationServiceImpl(CompilationRepository compilationRepository, EventService eventService, EventMapper eventMapper, CompilationMapper compilationMapper) {
         this.compilationRepository = compilationRepository;
-        this.eventRepository = eventRepository;
+        this.eventService = eventService;
         this.eventMapper = eventMapper;
+        this.compilationMapper = compilationMapper;
     }
 
+    @Transactional
     @Override
     public CompilationDTO addCompilation(RequestToCreateNewCompilationDTO newCompilationDTO) {
-
-        Compilation compilation = CompilationMapper.toCompilation(newCompilationDTO);
-
-        List<Long> eventsId = newCompilationDTO.getEventsId();
-        if (eventsId != null) {
-            compilation.setEvents(eventRepository.findAllByIdIn(eventsId));
+        if (newCompilationDTO.getPinned() == null) {
+            newCompilationDTO.setPinned(false);
         }
-
-        Compilation savedCompilation = compilationRepository.save(compilation);
-
-        return CompilationMapper.toCompilationDTO(savedCompilation, eventMapper);
+        List<Event> events = new ArrayList<>();
+        if (newCompilationDTO.getEvents() != null && !newCompilationDTO.getEvents().isEmpty()) {
+            events = eventService.findEventsByids(newCompilationDTO.getEvents());
+        }
+        Compilation compilation = compilationMapper.toCompilation(newCompilationDTO);
+        compilation.setEvents(events);
+        return compilationMapper.toCompilationDto(compilationRepository.save(compilation));
     }
 
+    @Transactional
     @Override
     public CompilationDTO updateCompilation(Long compId, UpdateCompilationDTO updateCompilationDTO) {
         Compilation foundCompilation = findCompilationById(compId);
-
-        List<Long> eventsId = updateCompilationDTO.getEventsId();
-        Boolean pinned = updateCompilationDTO.getPinned();
-        String title = updateCompilationDTO.getTitle();
-
-        if (eventsId != null) {
-            List<Event> events = updateCompilationDTO.getEventsId().stream().map(id -> Event.builder()
-                            .id(id)
-                            .build())
-                    .collect(Collectors.toList());
-
-            foundCompilation.setEvents(events);
+        if (updateCompilationDTO.getEvents() != null && !updateCompilationDTO.getEvents().isEmpty()) {
+            foundCompilation.setEvents(eventService.findEventsByids(updateCompilationDTO.getEvents()));
         }
-
-        foundCompilation.setPinned(pinned);
-        foundCompilation.setTitle(title);
-
-        Compilation savedCompilation = compilationRepository.save(foundCompilation);
-
-        return CompilationMapper.toCompilationDTO(savedCompilation, eventMapper);
+        compilationMapper.updateCompilation(updateCompilationDTO, foundCompilation);
+        return compilationMapper.toCompilationDto(foundCompilation);
     }
 
     private Compilation findCompilationById(long compId) {
@@ -80,30 +71,18 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public List<CompilationDTO> getCompilationsList(Boolean pinned, Integer from, Integer size) {
-        Pageable pageable = PageRequest.of(from / size, size);
-
-        if (pinned != null) {
-            List<Compilation> compilations = compilationRepository.findAllByPinned(pinned, pageable);
-
-            return toCompilationListDTO(compilations);
-        } else {
-            List<Compilation> compilations = compilationRepository.findAll(pageable).getContent();
-
-            return toCompilationListDTO(compilations);
-        }
-    }
-
-    private List<CompilationDTO> toCompilationListDTO(List<Compilation> compilations) {
-        return compilations.stream()
-                .map(compilation -> CompilationMapper.toCompilationDTO(compilation, eventMapper))
+        Pageable pageable = PageRequestUtil.of(from, size, Sort.by("id").ascending());
+        return compilationRepository.findCompilationByPinned(pinned, pageable).stream()
+                .map(compilationMapper::toCompilationDto)
                 .toList();
     }
 
     @Override
     public CompilationDTO getCompilationById(Long compId) {
-        return CompilationMapper.toCompilationDTO(findCompilationById(compId), eventMapper);
+        return compilationMapper.toCompilationDto(findCompilationById(compId));
     }
 
+    @Transactional
     @Override
     public void removeCompilation(Long compId) {
         findCompilationById(compId);

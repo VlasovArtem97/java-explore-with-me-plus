@@ -1,13 +1,10 @@
 package ru.practicum.ewm.compilations.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import ru.practicum.ewm.event.model.Event;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -16,16 +13,22 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "compilations", schema = "public")
+@EqualsAndHashCode(of = "id")
 public class Compilation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "compilation_id")
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Event> events = new ArrayList<>();
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "compilation_event",
+            joinColumns = @JoinColumn(name = "compilation_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
+    private List<Event> events;
 
-    @Column(nullable = false)
+    @NotNull
     private Boolean pinned;
 
     @Column(nullable = false)

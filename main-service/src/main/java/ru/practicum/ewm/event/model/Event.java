@@ -1,12 +1,15 @@
 package ru.practicum.ewm.event.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.ewm.category.model.Category;
+import ru.practicum.ewm.compilations.model.Compilation;
 import ru.practicum.ewm.event.status.StateEvent;
 import ru.practicum.ewm.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Setter
 @Getter
@@ -72,4 +75,9 @@ public class Event {
 
     @Transient
     private Long views;
+
+    @JsonIgnore
+    @ToString.Exclude
+    @ManyToMany(mappedBy = "events", fetch = FetchType.LAZY)
+    private List<Compilation> compilations;
 }

@@ -30,4 +30,6 @@ public interface EventService {
 
     void saveEventWithRequest(Event event);
 
+    List<Event> findEventsByids(List<Long> eventsIds);
+
 }

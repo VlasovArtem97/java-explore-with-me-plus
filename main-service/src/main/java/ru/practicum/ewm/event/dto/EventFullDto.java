@@ -16,13 +16,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class EventFullDto {
 
+    private Long id;
     private String annotation;
     private CategoryDto category;
     private Long confirmedRequests;
     private LocalDateTime createdOn;
     private String description;
     private LocalDateTime eventDate;
-    private Long id;
     private UserShortDto initiator;
     private LocationDto location;
     private Boolean paid;

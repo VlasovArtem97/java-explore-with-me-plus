@@ -15,11 +15,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class EventShortDto {
 
+    private Long id;
     private String annotation;
     private CategoryDto category;
     private Long confirmedRequests;
     private LocalDateTime eventDate;
-    private Long id;
     private UserShortDto initiator;
     private Boolean paid;
     private String title;
