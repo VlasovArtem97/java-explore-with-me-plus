@@ -47,11 +47,11 @@ services:
       retries: 30
       start_period: 15s
 
-  ewm:
+  ewm-service:
     build:
       context: ./main-service
-    container_name: ewm
-    ports: ["8080:8080"]
+    container_name: ewm-service
+    ports: [ "8080:8080" ]
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm
       - SPRING_DATASOURCE_USERNAME=ewm
@@ -59,7 +59,6 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=none
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
-      # на всякий случай пробрасываем адрес клиента статистики через ENV
       - STATS_CLIENT=http://stats-server:9090
     depends_on:
       ewm-db:
@@ -67,9 +66,9 @@ services:
       stats-server:
         condition: service_healthy
     healthcheck:
-      # у main-service нет actuator — проверим сам TCP-порт
-      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8080'"]
+      test: [ "CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8080'" ]
       interval: 5s
       timeout: 5s
       retries: 30
       start_period: 20s
+
