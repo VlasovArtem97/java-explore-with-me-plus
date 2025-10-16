@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   stats-db:
     image: postgres:16.1
@@ -13,26 +11,12 @@ services:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
-      retries: 10
-
-  stats-server:
-    build: ./stats-service/stats-server
-    image: stats-service
-    container_name: stats
-    ports: ["9090:9090"]
-    depends_on:
-      stats-db:
-        condition: service_healthy
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stat-server
-      - SPRING_DATASOURCE_USERNAME=stat
-      - SPRING_DATASOURCE_PASSWORD=stat
-      - STATS_CLIENT_URL=http://stats:9090/stats
+      retries: 20
 
   ewm-db:
     image: postgres:16.1
     container_name: ewm-db
-    ports: ["6542:5432"]
+    ports: ["5443:5432"]
     environment:
       - POSTGRES_DB=ewm
       - POSTGRES_USER=ewm
@@ -41,20 +25,51 @@ services:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 20
 
-  ewm-service:
-    build: ./main-service
-    image: ewm-service
+  stats:
+    build:
+      context: ./stats-service/stats-server
+    container_name: stats
+    ports: ["9090:9090"]
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stat-server
+      - SPRING_DATASOURCE_USERNAME=stat
+      - SPRING_DATASOURCE_PASSWORD=stat
+    depends_on:
+      stats-db:
+        condition: service_healthy
+    healthcheck:
+      # actuator есть в stats-server по зависимостям
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9090/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+
+  ewm:
+    build:
+      context: ./main-service
     container_name: ewm
     ports: ["8080:8080"]
-    depends_on:
-      ewm-db:
-        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm
       - SPRING_DATASOURCE_USERNAME=ewm
       - SPRING_DATASOURCE_PASSWORD=ewm
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      # на всякий случай пробрасываем адрес клиента статистики через ENV
+      - STATS_CLIENT=http://stats:9090
+    depends_on:
+      ewm-db:
+        condition: service_healthy
+      stats:
+        condition: service_healthy
+    healthcheck:
+      # у main-service нет actuator — проверим сам TCP-порт
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8080'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
