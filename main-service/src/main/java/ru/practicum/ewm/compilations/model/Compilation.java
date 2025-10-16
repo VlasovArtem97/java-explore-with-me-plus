@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "compilations", schema = "public")
+@Table(name = "compilations")
 @EqualsAndHashCode(of = "id")
 public class Compilation {
 
