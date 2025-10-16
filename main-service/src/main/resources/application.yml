@@ -21,8 +21,8 @@ logging:
   level:
     org.springframework.orm.jpa: INFO
     org.springframework.transaction: INFO
-    org.springframework.transaction.interceptor: TRACE
-    org.springframework.orm.jpa.JpaTransactionManager: DEBUG
-    org.zalando.logbook: TRACE
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.transaction.interceptor: WARN
+    org.springframework.orm.jpa.JpaTransactionManager: INFO
+    org.zalando.logbook: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.orm.jdbc.bind: WARN
