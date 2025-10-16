@@ -21,8 +21,7 @@ services:
     container_name: stats
     ports: ["9090:9090"]
     depends_on:
-      stats-db:
-        condition: service_healthy
+      - stats-db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stat-server
       - SPRING_DATASOURCE_USERNAME=stat
@@ -49,10 +48,8 @@ services:
     container_name: ewm
     ports: ["8080:8080"]
     depends_on:
-      ewm-db:
-        condition: service_healthy
-      stats-server:
-        condition: service_started
+      - stats-server
+      - ewm-db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm
       - SPRING_DATASOURCE_USERNAME=ewm
