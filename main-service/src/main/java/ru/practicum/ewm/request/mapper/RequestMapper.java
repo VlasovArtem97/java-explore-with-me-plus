@@ -1,21 +1,14 @@
 package ru.practicum.ewm.request.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.ewm.request.dto.RequestDTO;
 import ru.practicum.ewm.request.model.Request;
 
-public class RequestMapper {
+@Mapper(componentModel = "spring")
+public interface RequestMapper {
 
-    private RequestMapper() {
-
-    }
-
-    public static RequestDTO toRequestDTO(Request request) {
-        return RequestDTO.builder()
-                .id(request.getId())
-                .created(request.getCreated())
-                .eventId(request.getEvent().getId())
-                .requesterId(request.getRequester().getId())
-                .requestStatus(request.getRequestStatus())
-                .build();
-    }
+     @Mapping(source = "request.event.id", target = "eventId")
+     @Mapping(source = "request.requester.id", target = "requesterId")
+    RequestDTO toRequestDTO(Request request);
 }

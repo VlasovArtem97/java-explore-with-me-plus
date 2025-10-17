@@ -1,5 +1,6 @@
 package ru.practicum.ewm.request.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.error.ConflictException;
@@ -25,14 +26,17 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final UserService userService;
     private final EventService eventService;
+    private final RequestMapper requestMapper;
 
     @Autowired
-    public RequestServiceImpl(RequestRepository requestRepository, UserService userService, EventService eventService) {
+    public RequestServiceImpl(RequestRepository requestRepository, UserService userService, EventService eventService, RequestMapper requestMapper) {
         this.requestRepository = requestRepository;
         this.userService = userService;
         this.eventService = eventService;
+        this.requestMapper = requestMapper;
     }
 
+    @Transactional
     @Override
     public RequestDTO addRequestCurrentUser(Long userId, Long eventId) {
         User user = userService.findUserById(userId);
@@ -67,7 +71,7 @@ public class RequestServiceImpl implements RequestService {
                 request.setRequestStatus(RequestStatus.PENDING);
             }
         }
-        return RequestMapper.toRequestDTO(requestRepository.save(request));
+        return requestMapper.toRequestDTO(requestRepository.save(request));
     }
 
     @Override
@@ -75,10 +79,11 @@ public class RequestServiceImpl implements RequestService {
         userService.findUserById(userId);
 
         return requestRepository.findAllByRequesterId(userId).stream()
-                .map(RequestMapper::toRequestDTO)
+                .map(requestMapper::toRequestDTO)
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public RequestDTO cancelRequestCurrentUser(Long userId, Long requestId) {
         userService.findUserById(userId);
@@ -89,7 +94,7 @@ public class RequestServiceImpl implements RequestService {
 
         Request savedRequest = requestRepository.save(requestFromDatabase);
 
-        return RequestMapper.toRequestDTO(savedRequest);
+        return requestMapper.toRequestDTO(savedRequest);
     }
 
     @Override
@@ -106,7 +111,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestDTO> getRequestByEventId(Long eventId) {
         List<Request> requestList = requestRepository.getRequestByEventId(eventId);
-        return requestList.stream().map(RequestMapper::toRequestDTO).toList();
+        return requestList.stream().map(requestMapper::toRequestDTO).toList();
     }
 
     private Request getRequestById(Long requestId) {

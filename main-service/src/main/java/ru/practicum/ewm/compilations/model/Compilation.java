@@ -8,12 +8,14 @@ import ru.practicum.ewm.event.model.Event;
 import java.util.List;
 
 @Builder
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(of = "id")
+@ToString
 @Entity
 @Table(name = "compilations")
-@EqualsAndHashCode(of = "id")
 public class Compilation {
 
     @Id

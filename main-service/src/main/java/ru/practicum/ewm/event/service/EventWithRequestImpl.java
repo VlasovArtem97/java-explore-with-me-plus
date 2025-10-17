@@ -26,6 +26,7 @@ public class EventWithRequestImpl implements EventWithRequest {
     private final EventService eventService;
     private final UserService userService;
     private final RequestService requestService;
+    private final RequestMapper requestMapper;
 
     @Transactional
     @Override
@@ -86,8 +87,8 @@ public class EventWithRequestImpl implements EventWithRequest {
         eventService.saveEventWithRequest(event);
 
         return EventRequestStatusUpdateResult.builder()
-                .confirmedRequests(confirmedRequests.stream().map(RequestMapper::toRequestDTO).toList())
-                .rejectedRequests(rejectedRequests.stream().map(RequestMapper::toRequestDTO).toList())
+                .confirmedRequests(confirmedRequests.stream().map(requestMapper::toRequestDTO).toList())
+                .rejectedRequests(rejectedRequests.stream().map(requestMapper::toRequestDTO).toList())
                 .build();
     }
 
