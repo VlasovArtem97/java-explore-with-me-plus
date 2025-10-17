@@ -1,8 +1,8 @@
 package ru.practicum.ewm.request.service;
 
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.error.ConflictException;
 import ru.practicum.ewm.error.NotFoundException;
 import ru.practicum.ewm.event.model.Event;
@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @Service
 public class RequestServiceImpl implements RequestService {
 
