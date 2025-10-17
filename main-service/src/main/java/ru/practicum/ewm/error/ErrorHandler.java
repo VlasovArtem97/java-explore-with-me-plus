@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -84,7 +83,7 @@ public class ErrorHandler {
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleException(final Exception e) {
-        log.info("Internal server error - {}", e.getMessage());
+        log.error("Internal server error - {}", e.getMessage());
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error.", e.getMessage());
     }
 }
