@@ -31,6 +31,7 @@ public interface EventMapper {
         event.state(StateEvent.PENDING);
         event.confirmedRequests(0L);
         event.views(0L);
+        event.rating(0L);
     }
 
     EventFullDto toEventFullDto(Event event);

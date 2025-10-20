@@ -154,31 +154,45 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> findEventByParamsPublic(EventPublicParamsDto eventPublicParamsDto, HttpServletRequest request) {
+    public List<EventShortDto> findEventByParamsPublic(EventPublicParamsDto eventPublicParamsDto,
+                                                       HttpServletRequest request) {
         if (eventPublicParamsDto.getRangeEnd() != null && eventPublicParamsDto.getRangeStart() != null) {
             if (eventPublicParamsDto.getRangeEnd().isBefore(eventPublicParamsDto.getRangeStart())) {
                 throw new IllegalStateException("Дата RangeEnd не должна быть раньше даты RangeStart. RangeStart:" +
                         eventPublicParamsDto.getRangeStart() + ". RangeEnd:" + eventPublicParamsDto.getRangeEnd());
             }
         }
+
         BooleanBuilder booleanBuilder = EventRepository.PredicatesForParamPublic.build(eventPublicParamsDto);
 
-        String sort = (eventPublicParamsDto.getSort() != null &&
-                eventPublicParamsDto.getSort().equals(SortForParamPublicEvent.EVENT_DATE))
-                ? "eventDate"
-                : (eventPublicParamsDto.getSort() != null && eventPublicParamsDto.getSort()
-                .equals(SortForParamPublicEvent.VIEWS))
-                ? "views"
-                : "id";
+        String sort;
+        if (eventPublicParamsDto.getSort() == null) {
+            sort = "id";
+        } else if (eventPublicParamsDto.getSort().equals(SortForParamPublicEvent.EVENT_DATE)) {
+            sort = "eventDate";
+        } else if (eventPublicParamsDto.getSort().equals(SortForParamPublicEvent.VIEWS)) {
+            sort = "views";
+        } else if (eventPublicParamsDto.getSort().equals(SortForParamPublicEvent.RATING)) {
+            sort = "rating";
+        } else {
+            sort = "id";
+        }
 
-        Pageable pageable = PageRequestUtil.of(eventPublicParamsDto.getFrom(),
-                eventPublicParamsDto.getSize(), Sort.by(sort).descending());
+        Pageable pageable = PageRequestUtil.of(
+                eventPublicParamsDto.getFrom(),
+                eventPublicParamsDto.getSize(),
+                Sort.by(sort).descending()
+        );
 
-        List<Event> event = eventRepository.findAll(booleanBuilder, pageable).getContent();
-        List<Event> eventWithView = getStats(event, null, null, true);
+        List<Event> events = eventRepository.findAll(booleanBuilder, pageable).getContent();
+        List<Event> eventsWithViews = getStats(events, null, null, true);
         addViewEvent(request);
-        return eventWithView.stream().map(eventMapper::toEventShortDto).toList();
+
+        return eventsWithViews.stream()
+                .map(eventMapper::toEventShortDto)
+                .toList();
     }
+
 
     @Transactional
     private Event updateCategoryAndLocation(UpdateEventUserRequest updateEventUserRequest, Event event) {

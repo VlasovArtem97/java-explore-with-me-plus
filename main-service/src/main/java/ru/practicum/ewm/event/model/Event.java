@@ -3,6 +3,7 @@ package ru.practicum.ewm.event.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Formula;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.compilations.model.Compilation;
 import ru.practicum.ewm.event.status.StateEvent;
@@ -75,6 +76,9 @@ public class Event {
 
     @Transient
     private Long views;
+
+    @Formula("(select coalesce(sum(er.value),0) from event_ratings er where er.event_id = event_id)")
+    private Long rating;
 
     @JsonIgnore
     @ToString.Exclude
