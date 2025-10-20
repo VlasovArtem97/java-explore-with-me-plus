@@ -31,6 +31,10 @@ public class RatingServiceImpl implements RatingService {
         userService.findUserById(userId);
         Event event = eventService.findEventById(eventId);
 
+        if (event.getInitiator() != null && event.getInitiator().getId().equals(userId)) {
+            throw new ConflictException("Инициатор не может оценивать своё событие");
+        }
+
         if (event.getState() != StateEvent.PUBLISHED) {
             throw new ConflictException("Нельзя голосовать за непубликованное событие");
         }

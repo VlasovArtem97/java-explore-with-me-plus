@@ -17,4 +17,10 @@ public interface EventRatingRepository extends JpaRepository<EventRating, Long> 
 
     @Query("select count(er) from EventRating er where er.event.id = ?1 and er.value = -1")
     Long countDislikes(Long eventId);
+
+    @Query("select coalesce(sum(er.value), 0) " +
+            "from EventRating er " +
+            "where er.event.initiator.id = :userId")
+    Long sumScoreByUserId(Long userId);
+
 }
