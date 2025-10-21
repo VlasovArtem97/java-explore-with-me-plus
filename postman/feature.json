@@ -1,0 +1,265 @@
+{
+  "info": {
+    "_postman_id": "f7c63494-c213-45aa-9d7d-4725480ce714",
+    "name": "ExploreWithMe — rating_events (feature.json)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman tests for rating feature: like/dislike/remove/get summary and public sorting"
+  },
+  "item": [
+    {
+      "name": "Set env defaults (script)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Ensure default variables exist",
+              "pm.environment.set('baseUrl', pm.environment.get('baseUrl') || 'http://localhost:8080');",
+              "pm.environment.set('userId', pm.environment.get('userId') || '1');",
+              "pm.environment.set('eventId', pm.environment.get('eventId') || '1');",
+              "pm.test('Environment defaults set', function () {",
+              "  pm.expect(pm.environment.get('baseUrl')).to.be.a('string');",
+              "  pm.expect(pm.environment.get('userId')).to.be.a('string');",
+              "  pm.expect(pm.environment.get('eventId')).to.be.a('string');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/actuator/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "actuator",
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "POST like — /users/:userId/events/:eventId/rating",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/{{userId}}/events/{{eventId}}/rating",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "{{userId}}",
+            "events",
+            "{{eventId}}",
+            "rating"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"reaction\":\"LIKE\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 (liked)', function(){ pm.expect(pm.response.code).to.eql(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Has eventId/likes/dislikes/rating', function(){",
+              "  pm.expect(json).to.have.keys(['eventId','likes','dislikes','rating']);",
+              "});",
+              "pm.test('rating == likes - dislikes', function(){",
+              "  pm.expect(json.rating).to.eql(json.likes - json.dislikes);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST dislike — /users/:userId/events/:eventId/rating",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/{{userId}}/events/{{eventId}}/rating",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "{{userId}}",
+            "events",
+            "{{eventId}}",
+            "rating"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"reaction\":\"DISLIKE\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 (disliked)', function(){ pm.expect(pm.response.code).to.eql(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Has eventId/likes/dislikes/rating', function(){",
+              "  pm.expect(json).to.have.keys(['eventId','likes','dislikes','rating']);",
+              "});",
+              "pm.test('rating == likes - dislikes', function(){",
+              "  pm.expect(json.rating).to.eql(json.likes - json.dislikes);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET summary — /events/:eventId/rating",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/events/{{eventId}}/rating",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events",
+            "{{eventId}}",
+            "rating"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 (summary)', function(){ pm.expect(pm.response.code).to.eql(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Has eventId/likes/dislikes/rating', function(){",
+              "  pm.expect(json).to.have.keys(['eventId','likes','dislikes','rating']);",
+              "});",
+              "pm.test('Fields are numbers', function(){",
+              "  ['eventId','likes','dislikes','rating'].forEach(k => pm.expect(json[k]).to.be.a('number'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "DELETE my reaction — /users/:userId/events/:eventId/rating",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/users/{{userId}}/events/{{eventId}}/rating",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "{{userId}}",
+            "events",
+            "{{eventId}}",
+            "rating"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 (deleted)', function(){ pm.expect(pm.response.code).to.eql(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Has eventId/likes/dislikes/rating', function(){",
+              "  pm.expect(json).to.have.keys(['eventId','likes','dislikes','rating']);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public list sorted by RATING — /events?sort=RATING",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/events?sort=RATING",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events"
+          ],
+          "query": [
+            {
+              "key": "sort",
+              "value": "RATING"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 (public events)', function(){ pm.expect(pm.response.code).to.eql(200); });",
+              "const arr = pm.response.json();",
+              "pm.test('Array returned', function(){ pm.expect(Array.isArray(arr)).to.be.true; });",
+              "if (arr.length >= 2) {",
+              "  pm.test('Sorted by rating desc (best effort)', function(){",
+              "    for (let i=1;i<arr.length;i++){",
+              "      const prev = (arr[i-1].rating || 0);",
+              "      const cur  = (arr[i].rating || 0);",
+              "      pm.expect(prev).to.be.at.least(cur);",
+              "    }",
+              "  });",
+              "}"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "userId",
+      "value": "1"
+    },
+    {
+      "key": "eventId",
+      "value": "1"
+    }
+  ]
+}
