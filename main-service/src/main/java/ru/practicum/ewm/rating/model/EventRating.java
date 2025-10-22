@@ -9,14 +9,15 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "event_ratings",
-        uniqueConstraints = @UniqueConstraint(name = "uk_event_user", columnNames = {"event_id","user_id"}))
+        uniqueConstraints = @UniqueConstraint(name = "uk_event_user", columnNames = {"event_id", "user_id"}))
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventRating {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
