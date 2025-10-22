@@ -4,7 +4,8 @@ import java.util.Optional;
 
 public enum SortForParamPublicEvent {
     EVENT_DATE,
-    VIEWS;
+    VIEWS,
+    RATING;
 
     public static Optional<SortForParamPublicEvent> from(String stringSort) {
         for (SortForParamPublicEvent sort : values()) {
